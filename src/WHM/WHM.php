@@ -129,11 +129,11 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
      * @param $domain
      * @param $plan
      * @param $contactEmail
-     * @param $maxaddon
+     * @param $maxAddon
      * @param $ip
      * @return object
      */
-    public function accountCreate($username, $password, $domain, $plan, $contactEmail, $maxaddon, $ip)
+    public function accountCreate($username, $password, $domain, $plan, $contactEmail, $maxAddon, $ip)
     {
         $request = $this->send("json-api/createacct", [
             "username"     => $username,
@@ -142,7 +142,7 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
             "domain"       => $domain,
             "plan"         => $plan,
             "ip"           => $ip,
-            "maxaddon"     => $maxaddon,
+            "maxaddon"     => $maxAddon,
         ],
         [
             new IsEmpty,
@@ -150,9 +150,6 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
             new AccountRequestError
         ]);
 
-        $package = $request->result[0]->options->package;
-        $ip      = $request->result[0]->options->ip;
-
-        return (object) compact('username', 'password', 'domain', 'ip', 'contactEmail', 'package');
+        return $request->result[0]->options;
     }
 }
