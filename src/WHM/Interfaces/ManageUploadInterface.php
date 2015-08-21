@@ -1,10 +1,10 @@
 <?php
 
-namespace WHM\Interfaces;
+namespace Chernoff\WHM\Interfaces;
 
 /**
  * Interface ManageUploadInterface
- * @package WHM\Interfaces
+ * @package Chernoff\WHM\Interfaces
  */
 interface ManageUploadInterface
 {

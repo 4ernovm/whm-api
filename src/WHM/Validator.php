@@ -1,13 +1,13 @@
 <?php
 
-namespace WHM;
+namespace Chernoff\WHM;
 
-use WHM\Interfaces\ValidationRuleInterface;
-use WHM\Interfaces\ValidatorInterface;
+use Chernoff\WHM\Interfaces\ValidationRuleInterface;
+use Chernoff\WHM\Interfaces\ValidatorInterface;
 
 /**
  * Class Validator
- * @package WHM
+ * @package Chernoff\WHM
  */
 class Validator implements ValidatorInterface
 {

@@ -1,13 +1,13 @@
 <?php
 
-namespace WHM\ValidationRules;
+namespace Chernoff\WHM\ValidationRules;
 
-use WHM\Exceptions\CPanelErrorException;
-use WHM\Interfaces\ValidationRuleInterface;
+use Chernoff\WHM\Exceptions\CPanelErrorException;
+use Chernoff\WHM\Interfaces\ValidationRuleInterface;
 
 /**
  * Class DomainRequestError
- * @package WHM\ValidationRules
+ * @package Chernoff\WHM\ValidationRules
  */
 class DomainRequestError implements ValidationRuleInterface
 {

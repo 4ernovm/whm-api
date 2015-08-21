@@ -1,13 +1,13 @@
 <?php
 
-namespace WHM\ValidationRules;
+namespace Chernoff\WHM\ValidationRules;
 
-use WHM\Interfaces\ValidationRuleInterface;
+use Chernoff\WHM\Interfaces\ValidationRuleInterface;
 use Exception;
 
 /**
  * Class FileUploadError
- * @package WHM\ValidationRules
+ * @package Chernoff\WHM\ValidationRules
  */
 class FileUploadError implements ValidationRuleInterface
 {
