@@ -1,12 +1,12 @@
 <?php
 
-namespace WHM\ValidationRules;
+namespace Chernoff\WHM\ValidationRules;
 
-use WHM\Interfaces\ValidationRuleInterface;
+use Chernoff\WHM\Interfaces\ValidationRuleInterface;
 
 /**
  * Class IsNull
- * @package WHM\ValidationRules
+ * @package Chernoff\WHM\ValidationRules
  */
 class IsNull implements ValidationRuleInterface
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace WHM\ValidationRules;
+namespace Chernoff\WHM\ValidationRules;
 
-use WHM\Interfaces\ValidationRuleInterface;
+use Chernoff\WHM\Interfaces\ValidationRuleInterface;
 
 /**
  * Class AccountNotFound
- * @package WHM\ValidationRules
+ * @package Chernoff\WHM\ValidationRules
  */
 class AccountNotFound implements ValidationRuleInterface
 {

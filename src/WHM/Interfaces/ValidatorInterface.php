@@ -1,16 +1,16 @@
 <?php
 
-namespace WHM\Interfaces;
+namespace Chernoff\WHM\Interfaces;
 
 /**
  * Interface ValidatorInterface
- * @package WHM\Interfaces
+ * @package Chernoff\WHM\Interfaces
  */
 interface ValidatorInterface
 {
     /**
      * @param $response
-     * @param WHMValidationRuleInterface[] $rules
+     * @param ValidationRuleInterface[] $rules
      * @return mixed
      */
     public function validate($response, array $rules);
