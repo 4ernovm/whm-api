@@ -16,7 +16,7 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "4ernovm\\WHM\\": "src/WHM"
+            "Chernoff\\WHM\\": "src/WHM"
         }
   }
 }

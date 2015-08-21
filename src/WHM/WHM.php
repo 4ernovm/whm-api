@@ -1,18 +1,18 @@
 <?php
 
-namespace WHM;
+namespace Chernoff\WHM;
 
-use WHM\Interfaces\ManageAccountInterface;
-use WHM\Interfaces\ManageAddonDomainInterface;
-
-use WHM\ValidationRules\AccountNotFound;
-use WHM\ValidationRules\AccountRequestError;
-use WHM\ValidationRules\DomainRequestError;
-use WHM\ValidationRules\IsEmpty;
+use Chernoff\WHM\Interfaces\ManageAccountInterface;
+use Chernoff\WHM\Interfaces\ManageAddonDomainInterface;
+use Chernoff\WHM\ValidationRules\AccountNotFound;
+use Chernoff\WHM\ValidationRules\AccountRequestError;
+use Chernoff\WHM\ValidationRules\DomainRequestError;
+use Chernoff\WHM\ValidationRules\IsEmpty;
 use Exception;
 
 /**
  * Class WHM
+ * @package Chernoff\WHM
  */
 class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountInterface
 {

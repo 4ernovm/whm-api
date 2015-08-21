@@ -1,20 +1,20 @@
 <?php
 
-namespace WHM;
+namespace Chernoff\WHM;
 
-use WHM\Exceptions\CPanelErrorException;
-use WHM\Exceptions\CPanelNotFoundException;
-use WHM\Interfaces\ManageAddonDomainInterface;
-use WHM\Interfaces\ManageParkedDomainInterface;
-use WHM\Interfaces\ManageUploadInterface;
-use WHM\ValidationRules\AccountNotFound;
-use WHM\ValidationRules\DomainRequestError;
+use Chernoff\WHM\Exceptions\CPanelErrorException;
+use Chernoff\WHM\Exceptions\CPanelNotFoundException;
+use Chernoff\WHM\Interfaces\ManageAddonDomainInterface;
+use Chernoff\WHM\Interfaces\ManageParkedDomainInterface;
+use Chernoff\WHM\Interfaces\ManageUploadInterface;
+use Chernoff\WHM\ValidationRules\AccountNotFound;
+use Chernoff\WHM\ValidationRules\DomainRequestError;
 
 use Exception;
 
 /**
  * Class CPanel
- * @package WHM
+ * @package Chernoff\WHM
  */
 class CPanel extends WHMBase implements ManageAddonDomainInterface, ManageParkedDomainInterface, ManageUploadInterface
 {

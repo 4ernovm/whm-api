@@ -1,9 +1,9 @@
 <?php
 
-namespace WHM;
+namespace Chernoff\WHM;
 
-use WHM\Exceptions\CPanelNotFoundException;
-use WHM\Interfaces\DeployerInterface;
+use Chernoff\WHM\Exceptions\CPanelNotFoundException;
+use Chernoff\WHM\Interfaces\DeployerInterface;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -14,7 +14,7 @@ use Exception;
 
 /**
  * Class GuzzleDeployer
- * @package WHM
+ * @package Chernoff\WHM
  */
 class GuzzleDeployer implements DeployerInterface
 {

@@ -1,15 +1,15 @@
 <?php
 
-namespace WHM;
+namespace Chernoff\WHM;
 
-use WHM\Interfaces\DeployerInterface;
-use WHM\Interfaces\ValidationRuleInterface;
-use WHM\ValidationRules\HasError;
-use WHM\ValidationRules\IsNull;
+use Chernoff\WHM\Interfaces\DeployerInterface;
+use Chernoff\WHM\Interfaces\ValidationRuleInterface;
+use Chernoff\WHM\ValidationRules\HasError;
+use Chernoff\WHM\ValidationRules\IsNull;
 
 /**
  * Class WHMBase
- * @package WHM
+ * @package Chernoff\WHM
  */
 abstract class WHMBase
 {

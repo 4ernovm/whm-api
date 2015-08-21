@@ -1,10 +1,10 @@
 <?php
 
-namespace WHM\Exceptions;
+namespace Chernoff\WHM\Exceptions;
 
 /**
  * Class CPanelErrorException
- * @package WHM\Exceptions
+ * @package Chernoff\WHM\Exceptions
  *
  * Is being thrown when cPanel or WHM returns error.
  */
