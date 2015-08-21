@@ -8,6 +8,7 @@ use Chernoff\WHM\ValidationRules\AccountNotFound;
 use Chernoff\WHM\ValidationRules\AccountRequestError;
 use Chernoff\WHM\ValidationRules\DomainRequestError;
 use Chernoff\WHM\ValidationRules\IsEmpty;
+use Chernoff\WHM\ValidationRules\IsNull;
 use Exception;
 
 /**
@@ -120,5 +121,38 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
         }
 
         return $domains;
+    }
+
+    /**
+     * @param $username
+     * @param $password
+     * @param $domain
+     * @param $plan
+     * @param $contactEmail
+     * @param $maxaddon
+     * @param $ip
+     * @return object
+     */
+    public function accountCreate($username, $password, $domain, $plan, $contactEmail, $maxaddon, $ip)
+    {
+        $request = $this->send("json-api/createacct", [
+            "username"     => $username,
+            "password"     => $password,
+            "contactemail" => $contactEmail,
+            "domain"       => $domain,
+            "plan"         => $plan,
+            "ip"           => $ip,
+            "maxaddon"     => $maxaddon,
+        ],
+        [
+            new IsEmpty,
+            new IsNull,
+            new AccountRequestError
+        ]);
+
+        $package = $request->result[0]->options->package;
+        $ip      = $request->result[0]->options->ip;
+
+        return (object) compact('username', 'password', 'domain', 'ip', 'contactEmail', 'package');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Chernoff\WHM;
 
+use Chernoff\WHM\Interfaces\AuthorizationInterface;
 use Chernoff\WHM\Interfaces\DeployerInterface;
 use Chernoff\WHM\Interfaces\ValidationRuleInterface;
 use Chernoff\WHM\ValidationRules\HasError;
@@ -33,26 +34,35 @@ abstract class WHMBase
     }
 
     /**
-     * @param array $credentails
+     * @param AuthorizationInterface $auth
      * @return $this
      */
-    public function setCredentials(array $credentails)
+    public function setAuth(AuthorizationInterface $auth)
     {
-        if (empty($credentails['port'])) {
-            $credentails['port'] = $this->defaultPort;
-        }
-
-        $this->deployer->setCredentials($credentails);
+        $this->deployer->setAuth($auth);
 
         return $this;
     }
 
     /**
-     * @return array
+     * @return AuthorizationInterface
      */
-    public function getCredentials()
+    public function getAuth()
     {
-        return $this->deployer->getCredentials();
+        return $this->deployer->getAuth();
+    }
+
+    /**
+     * @param $host
+     * @param $port
+     * @param bool $isSecure
+     * @return $this
+     */
+    public function setTarget($host, $port, $isSecure = true)
+    {
+        $this->deployer->setHost($host)->setPort($port)->setProtocol(($isSecure) ? 'https' : 'http');
+
+        return $this;
     }
 
     /**
