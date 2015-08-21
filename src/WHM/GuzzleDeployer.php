@@ -3,6 +3,7 @@
 namespace Chernoff\WHM;
 
 use Chernoff\WHM\Exceptions\CPanelNotFoundException;
+use Chernoff\WHM\Interfaces\AuthorizationInterface;
 use Chernoff\WHM\Interfaces\DeployerInterface;
 
 use GuzzleHttp\Client;
@@ -21,47 +22,99 @@ class GuzzleDeployer implements DeployerInterface
     /** @var  \GuzzleHttp\Client */
     protected $client;
 
-    /** @var  array */
-    protected $credentials;
+    /** @var  AuthorizationInterface */
+    protected $auth;
 
-    protected $requiredKeys = array("host", "port", "username", "password");
+    /**
+     * @var string
+     */
+    protected $protocol = 'https';
+
+    /** @var  string */
+    protected $host;
+
+    /** @var  int */
+    protected $port;
 
     public function __construct(Client $client) {
         $this->client = $client;
     }
 
     /**
-     * @param array $credentials
+     * @param AuthorizationInterface $auth
      * @throws Exception
      * @return DeployerInterface
      */
-    public function setCredentials(array $credentials)
+    public function setAuth(AuthorizationInterface $auth)
     {
-        $this->isValid($credentials);
-        $this->credentials = $credentials;
+        $this->auth = $auth;
 
         return $this;
     }
 
     /**
-     * @return array
+     * @return AuthorizationInterface
      */
-    public function getCredentials()
+    public function getAuth()
     {
-        return $this->credentials;
+        return $this->auth;
     }
 
     /**
-     * Ensure that we have all information we need.
-     *
-     * @param array $credentials
-     * @throws Exception
+     * @param $host
+     * @return $this
      */
-    protected function isValid(array $credentials)
+    public function setHost($host)
     {
-        if ($keys = array_diff_key(array_flip($this->requiredKeys), $credentials)) {
-            throw new Exception(implode(',', $keys) . " is/are required");
-        }
+        $this->host = $host;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
+     * @param $protocol
+     * @return $this
+     */
+    public function setProtocol($protocol)
+    {
+        $this->protocol = $protocol;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProtocol()
+    {
+        return $this->protocol;
+    }
+
+    /**
+     * @param $port
+     * @return $this
+     */
+    public function setPort($port)
+    {
+        $this->port = $port;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPort()
+    {
+        return $this->port;
     }
 
     /**
@@ -74,8 +127,6 @@ class GuzzleDeployer implements DeployerInterface
      * @throws Exception
      */
     public function send($uri, array $query = array(), array $body = array(), $method = 'GET') {
-        $this->isValid($this->credentials);
-
         $url     = $this->getRequestUrl($uri);
         $options = $this->getDefaultRequestOptions();
 
@@ -91,7 +142,11 @@ class GuzzleDeployer implements DeployerInterface
 
         try {
             /** @var RequestInterface $request */
-            $request = $this->client->createRequest($method, $url, $options);
+            $request = $this->client->createRequest($method, $url, $options)->setHeaders($this->auth->toArray());
+
+            if (!empty($postBody)) {
+                $request->setBody($postBody);
+            }
 
             return json_decode($this->client->send($request)->getBody(true));
         }
@@ -117,7 +172,6 @@ class GuzzleDeployer implements DeployerInterface
     protected function getDefaultRequestOptions()
     {
         return array(
-            "auth" => array($this->credentials["username"], $this->credentials["password"], "Basic"),
             "config" => array(
                 "curl" => array(
                     CURLOPT_SSL_VERIFYPEER => 0,
@@ -135,13 +189,17 @@ class GuzzleDeployer implements DeployerInterface
     /**
      * @param string $uri
      * @return string
+     * @throws Exception
      */
     protected function getRequestUrl($uri)
     {
-        // Remove leading and trailing slashes.
-        $uri  = trim($uri, DIRECTORY_SEPARATOR);
-        $base = "https://{$this->credentials["host"]}:{$this->credentials["port"]}";
+        if (empty($this->host) || empty($this->port)) {
+            throw new Exception("Host and port are required");
+        }
 
-        return $base . DIRECTORY_SEPARATOR . $uri;
+        // Remove leading and trailing slashes.
+        $uri = trim($uri, '/');
+
+        return "{$this->protocol}://{$this->host}:{$this->port}/{$uri}";
     }
 }

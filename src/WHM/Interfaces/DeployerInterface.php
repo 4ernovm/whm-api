@@ -9,15 +9,15 @@ namespace Chernoff\WHM\Interfaces;
 interface DeployerInterface
 {
     /**
-     * @param array $credentials
+     * @param AuthorizationInterface $auth
      * @return self
      */
-    public function setCredentials(array $credentials);
+    public function setAuth(AuthorizationInterface $auth);
 
     /**
-     * @return array
+     * @return AuthorizationInterface
      */
-    public function getCredentials();
+    public function getAuth();
 
     /**
      * @param string $uri
