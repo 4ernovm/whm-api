@@ -18,7 +18,7 @@ class AccountRequestError implements ValidationRuleInterface
     public function validate($response)
     {
         if ($response->result[0]->status != 1) {
-            throw new \Exception("Error");
+            throw new \Exception($response->result[0]->statusmsg);
         }
     }
 }
