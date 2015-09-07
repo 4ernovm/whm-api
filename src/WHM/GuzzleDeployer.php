@@ -151,15 +151,22 @@ class GuzzleDeployer implements DeployerInterface
             return json_decode($this->client->send($request)->getBody(true));
         }
         catch (RequestException $e) {
-            switch ($e->getResponse()->getStatusCode()) {
-                case 0:
-                    throw new CPanelNotFoundException("cPanel Not Found");
+            $response = $e->getResponse();
 
-                case 403:
-                    throw new Exception("Invalid Creds");
+            if ($response) {
+                switch ($e->getResponse()->getStatusCode()) {
+                    case 0:
+                        throw new CPanelNotFoundException("cPanel Not Found");
 
-                default:
-                    throw new Exception("cPanel Status: " . $e->getResponse()->getStatusCode());
+                    case 403:
+                        throw new Exception("Invalid Creds");
+
+                    default:
+                        throw new Exception("cPanel Status: " . $e->getResponse()->getStatusCode());
+                }
+            }
+            else {
+                throw new Exception("WHM response is empty");
             }
         }
     }

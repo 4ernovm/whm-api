@@ -17,7 +17,7 @@ class IsEmpty implements ValidationRuleInterface
      */
     public function validate($response)
     {
-        if (empty($response) || empty($response->cpanelresult)) {
+        if (empty($response) || (empty($response->cpanelresult) && empty($response->result))) {
             throw new \Exception("cPanel Result NULL");
         }
     }
