@@ -108,7 +108,7 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
     {
         $request = $this->deployer->send("json-api/cpanel", [
             "cpanel_jsonapi_user"   => strtolower($whmUser),
-            "cpanel_jsonapi_module" => "Park",
+            "cpanel_jsonapi_module" => "AddonDomain",
             "cpanel_jsonapi_func"   => "listaddondomains"
         ]);
 
@@ -151,5 +151,64 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
         ]);
 
         return $request->result[0]->options;
+    }
+
+    /**
+     * @param $username
+     * @param $plan
+     * @return mixed
+     */
+    public function changePackage($username, $plan)
+    {
+        $request = $this->send(
+            "json-api/changepackage",
+            ["user" => $username, "plan" => $plan],
+            [new IsEmpty, new IsNull, new AccountRequestError]
+        );
+
+        return ($request->result[0]->status == 1);
+    }
+
+    /**
+     * @param $username
+     * @return bool
+     */
+    public function unsuspendAccount($username)
+    {
+        $request = $this->send(
+            "json-api/unsuspendacct",
+            ["user" => $username]
+        );
+
+        return ($request->cpanelresult->data[0]->result == 1);
+    }
+
+    /**
+     * @param $username
+     * @param null $reason
+     * @return bool
+     */
+    public function suspendAccount($username, $reason = null)
+    {
+        $request = $this->send(
+            "json-api/suspendacct",
+            ["user" => $username, "reason" => $reason]
+        );
+
+        return ($request->cpanelresult->data[0]->result == 1);
+    }
+
+    /**
+     * @param $username
+     * @return bool
+     */
+    public function terminateAccount($username) {
+        $request = $this->send(
+            "json-api/removeacct",
+            ["user" => $username],
+            [new IsEmpty, new IsNull, new AccountRequestError]
+        );
+
+        return ($request->result[0]->status == 1);
     }
 }
