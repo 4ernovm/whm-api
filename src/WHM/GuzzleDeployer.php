@@ -3,6 +3,7 @@
 namespace Chernoff\WHM;
 
 use Chernoff\WHM\Exceptions\CPanelNotFoundException;
+use Chernoff\WHM\Exceptions\WHMEmptyResponseException;
 use Chernoff\WHM\Interfaces\AuthorizationInterface;
 use Chernoff\WHM\Interfaces\DeployerInterface;
 
@@ -166,7 +167,7 @@ class GuzzleDeployer implements DeployerInterface
                 }
             }
             else {
-                throw new Exception("WHM response is empty");
+                throw new WHMEmptyResponseException("WHM response is empty");
             }
         }
     }
