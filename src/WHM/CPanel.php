@@ -138,10 +138,9 @@ class CPanel extends WHMBase implements ManageAddonDomainInterface, ManageParked
      * @throws Exception
      * @return bool
      */
-    public function domainRemove($domain, $username = null) {
+    public function domainRemove($domain, $username) {
         $subdomain = str_replace(".", "-", $domain);
-        $username  = strtolower($this->credentials["username"]);
-        $request   = $this->send("json-api/accountsummary", ["user" => $username], $this->addRule(new AccountNotFound));
+        $request   = $this->send("json-api/accountsummary", ["user" => strtolower($username)], $this->addRule(new AccountNotFound));
         $user      = $request->acct[0];
         $response  = $this->send("json-api/cpanel", [
             "cpanel_jsonapi_module" => "AddonDomain",
