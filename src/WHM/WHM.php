@@ -77,8 +77,7 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
     public function domainRemove($domain, $whmUser)
     {
         $subdomain = str_replace(".", "-", $domain);
-        $creds     = $this->deployer->getCredentials();
-        $user      = $this->getInfo($creds["username"]);
+        $user      = $this->getInfo($whmUser);
         $request   = $this->send("json-api/cpanel", [
             "cpanel_jsonapi_user"   => strtolower($whmUser),
             "cpanel_jsonapi_module" => "AddonDomain",
