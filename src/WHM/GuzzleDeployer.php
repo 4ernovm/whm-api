@@ -10,6 +10,7 @@ use Chernoff\WHM\Interfaces\DeployerInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\RequestInterface;
+use GuzzleHttp\Message\ResponseInterface;
 use GuzzleHttp\Post\PostBody;
 
 use Exception;
@@ -149,7 +150,10 @@ class GuzzleDeployer implements DeployerInterface
                 $request->setBody($postBody);
             }
 
-            return json_decode($this->client->send($request)->getBody(true));
+            /** @var ResponseInterface $response */
+            $response = $this->client->send($request);
+
+            return json_decode($response->getBody()->getContents());
         }
         catch (RequestException $e) {
             $response = $e->getResponse();
