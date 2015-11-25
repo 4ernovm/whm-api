@@ -1,7 +1,7 @@
 {
     "name": "4ernovm/whm-api",
     "require": {
-        "guzzlehttp/guzzle": "~4.0",
+        "guzzlehttp/guzzle": "4.2.*",
         "php": ">=5.4.0"
     },
     "require-dev": {
