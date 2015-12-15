@@ -27,9 +27,7 @@ class GuzzleDeployer implements DeployerInterface
     /** @var  AuthorizationInterface */
     protected $auth;
 
-    /**
-     * @var string
-     */
+    /** @var string  */
     protected $protocol = 'https';
 
     /** @var  string */
@@ -38,8 +36,12 @@ class GuzzleDeployer implements DeployerInterface
     /** @var  int */
     protected $port;
 
-    public function __construct(Client $client) {
-        $this->client = $client;
+    /** @var bool  */
+    protected $showError;
+
+    public function __construct(Client $client, $showError = false) {
+        $this->client    = $client;
+        $this->showError = $showError;
     }
 
     /**
@@ -159,7 +161,7 @@ class GuzzleDeployer implements DeployerInterface
             $response = $e->getResponse();
 
             if ($response) {
-                switch ($e->getResponse()->getStatusCode()) {
+                switch ($response->getStatusCode()) {
                     case 0:
                         throw new CPanelNotFoundException("cPanel Not Found");
 
@@ -167,11 +169,17 @@ class GuzzleDeployer implements DeployerInterface
                         throw new Exception("Invalid Creds");
 
                     default:
-                        throw new Exception("cPanel Status: " . $e->getResponse()->getStatusCode());
+                        throw new Exception("cPanel Status: " . $response->getStatusCode());
                 }
             }
             else {
-                throw new WHMEmptyResponseException("WHM response is empty");
+                $msg = "WHM response is empty";
+
+                if ($this->showError) {
+                    $msg .= "Error: {$e->getMessage()}";
+                }
+
+                throw new WHMEmptyResponseException($msg);
             }
         }
     }
