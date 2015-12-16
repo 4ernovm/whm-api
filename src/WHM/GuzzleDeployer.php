@@ -199,7 +199,7 @@ class GuzzleDeployer implements DeployerInterface
                     CURLOPT_HEADER         => 0,
                     CURLOPT_RETURNTRANSFER => 1,
                     CURLOPT_TIMEOUT        => 20,
-                    CURLOPT_CONNECTTIMEOUT => 5,
+                    CURLOPT_CONNECTTIMEOUT => 10,
                     CURLOPT_FOLLOWLOCATION => true,
                 ),
             ),
