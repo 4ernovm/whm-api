@@ -36,12 +36,11 @@ class GuzzleDeployer implements DeployerInterface
     /** @var  int */
     protected $port;
 
-    /** @var bool  */
-    protected $showError;
-
-    public function __construct(Client $client, $showError = false) {
-        $this->client    = $client;
-        $this->showError = $showError;
+    /**
+     * @param Client $client
+     */
+    public function __construct(Client $client) {
+        $this->client = $client;
     }
 
     /**
@@ -173,13 +172,7 @@ class GuzzleDeployer implements DeployerInterface
                 }
             }
             else {
-                $msg = "WHM response is empty";
-
-                if ($this->showError) {
-                    $msg .= "Error: {$e->getMessage()}";
-                }
-
-                throw new WHMEmptyResponseException($msg);
+                throw new WHMEmptyResponseException($e->getMessage());
             }
         }
     }
