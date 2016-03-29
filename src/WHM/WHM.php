@@ -9,6 +9,7 @@ use Chernoff\WHM\ValidationRules\AccountRequestError;
 use Chernoff\WHM\ValidationRules\DomainRequestError;
 use Chernoff\WHM\ValidationRules\IsEmpty;
 use Chernoff\WHM\ValidationRules\IsNull;
+use Chernoff\WHM\ValidationRules\PackageError;
 use Exception;
 
 /**
@@ -161,11 +162,41 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
     {
         $request = $this->send(
             "json-api/changepackage",
-            ["user" => $username, "plan" => $plan],
+            ["user" => $username, "pkg" => $plan],
             [new IsEmpty, new IsNull, new AccountRequestError]
         );
 
         return ($request->result[0]->status == 1);
+    }
+
+    /**
+     * @param $plan
+     * @return mixed
+     */
+    public function getPackage($plan)
+    {
+        $request = $this->send(
+            "json-api/getpkginfo",
+            ["pkg" => $plan, "api.version" => 1],
+            [new IsNull, new PackageError]
+        );
+
+        return $request->data->pkg;
+    }
+
+    /**
+     * @param $plan
+     * @return mixed
+     */
+    public function addPackage($plan, $maxDomains)
+    {
+        $request = $this->send(
+            "json-api/addpkg",
+            ["name" => $plan, "maxaddon" => $maxDomains, "api.version" => 1],
+            [new IsNull, new PackageError]
+        );
+
+        return $request->data->pkg;
     }
 
     /**
