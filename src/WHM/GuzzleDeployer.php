@@ -14,6 +14,7 @@ use GuzzleHttp\Message\ResponseInterface;
 use GuzzleHttp\Post\PostBody;
 
 use Exception;
+use GuzzleHttp\Url;
 
 /**
  * Class GuzzleDeployer
@@ -145,7 +146,8 @@ class GuzzleDeployer implements DeployerInterface
 
         try {
             /** @var RequestInterface $request */
-            $request = $this->client->createRequest($method, $url, $options)->setHeaders($this->auth->toArray());
+            $request = $this->client->createRequest($method, $url, $options);
+            $request->setHeaders($this->auth->toArray());
 
             if (!empty($postBody)) {
                 $request->setBody($postBody);
@@ -154,7 +156,7 @@ class GuzzleDeployer implements DeployerInterface
             /** @var ResponseInterface $response */
             $response = $this->client->send($request);
 
-            return json_decode($response->getBody()->getContents());
+            return $response->json();
         }
         catch (RequestException $e) {
             $response = $e->getResponse();
@@ -174,6 +176,15 @@ class GuzzleDeployer implements DeployerInterface
             else {
                 throw new WHMEmptyResponseException($e->getMessage());
             }
+        }
+        catch (Exception $e) {
+            // Try again in case of SSH connection issues
+            // @TODO add retries limitation
+            if (substr_count($e->getMessage(), "SSH")) {
+                return $this->send($uri, $query, $body, $method);
+            }
+
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -210,9 +221,6 @@ class GuzzleDeployer implements DeployerInterface
             throw new Exception("Host and port are required");
         }
 
-        // Remove leading and trailing slashes.
-        $uri = trim($uri, '/');
-
-        return "{$this->protocol}://{$this->host}:{$this->port}/{$uri}";
+        return new Url($this->protocol, $this->host, null, null, $this->port, $uri);
     }
 }
