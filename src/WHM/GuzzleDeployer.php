@@ -156,7 +156,7 @@ class GuzzleDeployer implements DeployerInterface
             /** @var ResponseInterface $response */
             $response = $this->client->send($request);
 
-            return $response->json();
+            return $response->json(["object" => true]);
         }
         catch (RequestException $e) {
             $response = $e->getResponse();
