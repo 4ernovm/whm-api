@@ -87,13 +87,12 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
 
         $domainInfo = reset($domainsInfo);
         $subdomain = $domainInfo->fullsubdomain;
-        $user      = $this->getInfo($whmUser);
         $request   = $this->send("json-api/cpanel", [
             "cpanel_jsonapi_user"   => strtolower($whmUser),
             "cpanel_jsonapi_module" => "AddonDomain",
             "cpanel_jsonapi_func"   => "deladdondomain",
             "domain"                => $domain,
-            "subdomain"             => "{$subdomain}.{$user->domain}"
+            "subdomain"             => $subdomain,
         ], $this->addRules([new IsEmpty, new DomainRequestError]));
 
         return ($request->cpanelresult->data[0]->result == 1);
