@@ -23,18 +23,25 @@ class CPanel extends WHMBase implements ManageAddonDomainInterface, ManageParked
 
     /**
      * @param null $username
+     * @param null $domain
      * @return array
      */
-    public function domainsGetParked($username = null)
+    public function domainsGetParked($username = null, $domain = null)
     {
-        $domains = array();
-        $request = $this->send("json-api/cpanel", [
+        $request = [
             "cpanel_jsonapi_module" => "Park",
             "cpanel_jsonapi_func"   => "listparkeddomains",
-        ]);
+        ];
 
-        if (!empty($request->cpanelresult->data)) {
-            foreach ($request->cpanelresult->data as $domain) {
+        if ($domain) {
+            $request['regex'] = "^{$domain}$";
+        }
+
+        $domains = array();
+        $response = $this->send("json-api/cpanel", $request);
+
+        if (!empty($response->cpanelresult->data)) {
+            foreach ($response->cpanelresult->data as $domain) {
                 $domains[] = $domain->domain;
             }
         }
@@ -64,7 +71,7 @@ class CPanel extends WHMBase implements ManageAddonDomainInterface, ManageParked
      * @return bool
      */
     public function domainParked($domain, $username = null) {
-        return in_array($domain, $this->domainsGetParked($username));
+        return in_array($domain, $this->domainsGetParked($username, $domain));
     }
 
     /**
@@ -85,19 +92,42 @@ class CPanel extends WHMBase implements ManageAddonDomainInterface, ManageParked
 
     /**
      * @param null $username
+     * @param null $domain
      * @return array
      */
-    public function domainsGetAddon($username = null)
+    public function domainsGetAddon($username = null, $domain = null)
     {
         $domains = array();
-        $request = $this->send("json-api/cpanel", [
+
+        foreach ($this->domainsGetAddonAll($username, $domain) as $domain) {
+            $domains[] = $domain->domain;
+        }
+
+        return $domains;
+    }
+
+    /**
+     * @param null $username
+     * @param null $domain
+     * @return array
+     */
+    public function domainsGetAddonAll($username = null, $domain = null)
+    {
+        $request = [
             "cpanel_jsonapi_module" => "Park",
             "cpanel_jsonapi_func"   => "listaddondomains",
-        ]);
+        ];
 
-        if (!empty($request->cpanelresult->data)) {
-            foreach ($request->cpanelresult->data as $domain) {
-                $domains[] = $domain->domain;
+        if ($domain) {
+            $request['regex'] = "^{$domain}$";
+        }
+
+        $domains = array();
+        $response = $this->send("json-api/cpanel", $request);
+
+        if (!empty($response->cpanelresult->data)) {
+            foreach ($response->cpanelresult->data as $domain) {
+                $domains[] = $domain;
             }
         }
 
@@ -128,7 +158,7 @@ class CPanel extends WHMBase implements ManageAddonDomainInterface, ManageParked
      * @return bool
      */
     public function domainAdded($domain, $username = null) {
-        return in_array($domain, $this->domainsGetAddon($username));
+        return in_array($domain, $this->domainsGetAddon($username, $domain));
     }
 
     /**
@@ -139,7 +169,16 @@ class CPanel extends WHMBase implements ManageAddonDomainInterface, ManageParked
      * @return bool
      */
     public function domainRemove($domain, $username) {
-        $subdomain = str_replace(".", "-", $domain);
+        if (!($domainsInfo = $this->domainsGetAddonAll($username, $domain))) {
+            return false;
+        }
+
+        if (count($domainsInfo) != 1) {
+            $domainsInfo = array_filter($domainsInfo, function ($item) use ($domain) { return ($item->domain == $domain); });
+        }
+
+        $domainInfo = reset($domainsInfo);
+        $subdomain = $domainInfo->fullsubdomain;
         $request   = $this->send("json-api/accountsummary", ["user" => strtolower($username)], $this->addRule(new AccountNotFound));
         $user      = $request->acct[0];
         $response  = $this->send("json-api/cpanel", [
