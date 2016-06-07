@@ -77,7 +77,16 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
      */
     public function domainRemove($domain, $whmUser)
     {
-        $subdomain = str_replace(".", "-", $domain);
+        if (!($domainsInfo = $this->domainsGetAddonAll($whmUser, $domain))) {
+            return false;
+        }
+
+        if (count($domainsInfo) != 1) {
+            $domainsInfo = array_filter($domainsInfo, function ($item) use ($domain) { return ($item->domain == $domain); });
+        }
+
+        $domainInfo = reset($domainsInfo);
+        $subdomain = $domainInfo->fullsubdomain;
         $user      = $this->getInfo($whmUser);
         $request   = $this->send("json-api/cpanel", [
             "cpanel_jsonapi_user"   => strtolower($whmUser),
@@ -97,26 +106,48 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
      */
     public function domainAdded($domain, $whmUser)
     {
-        return in_array($domain, $this->domainsGetAddon($whmUser));
+        return in_array($domain, $this->domainsGetAddon($whmUser, $domain));
     }
 
     /**
-     * @param $whmUser
+     * @param string $whmUser
+     * @param null $domain
      * @return array
      */
-    public function domainsGetAddon($whmUser)
+    public function domainsGetAddon($whmUser, $domain = null)
     {
-        $request = $this->deployer->send("json-api/cpanel", [
+        $domains = [];
+
+        foreach ($this->domainsGetAddonAll($whmUser, $domain) as $domain) {
+            $domains[] = $domain->domain;
+        }
+
+        return $domains;
+    }
+
+    /**
+     * @param string $whmUser
+     * @param null $domain
+     * @return array
+     */
+    public function domainsGetAddonAll($whmUser, $domain = null)
+    {
+        $request = [
             "cpanel_jsonapi_user"   => strtolower($whmUser),
             "cpanel_jsonapi_module" => "AddonDomain",
             "cpanel_jsonapi_func"   => "listaddondomains"
-        ]);
+        ];
 
+        if ($domain) {
+            $request['regex'] = "^{$domain}$";
+        }
+
+        $response = $this->deployer->send("json-api/cpanel", $request);
         $domains = [];
 
-        if (!empty($request->cpanelresult->data)) {
-            foreach ($request->cpanelresult->data as $domain) {
-                $domains[] = $domain->domain;
+        if (!empty($response->cpanelresult->data)) {
+            foreach ($response->cpanelresult->data as $domain) {
+                $domains[] = $domain;
             }
         }
 
