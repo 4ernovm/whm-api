@@ -191,6 +191,60 @@ class CPanel extends WHMBase implements ManageAddonDomainInterface, ManageParked
     }
 
     /**
+     * @param null $subdomain
+     * @return array
+     */
+    public function subdomainsGetAll($subdomain = null)
+    {
+        $request = [
+            "cpanel_jsonapi_module" => "SubDomain",
+            "cpanel_jsonapi_func"   => "listsubdomains",
+        ];
+
+        if ($subdomain) {
+            $request['regex'] = "^{$subdomain}";
+        }
+
+        $subdomains = array();
+        $response = $this->send("json-api/cpanel", $request);
+
+        if (!empty($response->cpanelresult->data)) {
+            foreach ($response->cpanelresult->data as $subdomain) {
+                $subdomains[] = $subdomain;
+            }
+        }
+
+        return $subdomains;
+    }
+
+    /**
+     * @param $subdomain
+     * @return bool
+     */
+    public function subdomainRemove($subdomain)
+    {
+        $subdomain = str_replace(".", "-", $subdomain);
+
+        if (!($subdomainsInfo = $this->subdomainsGetAll($subdomain))) {
+            return false;
+        }
+
+        if (count($subdomainsInfo) != 1) {
+            $subdomainsInfo = array_filter($subdomainsInfo, function ($item) use ($subdomain) { return ($item->domain == "{$subdomain}.{$item->rootdomain}"); });
+        }
+
+        $subdomainInfo = reset($subdomainsInfo);
+        $subdomain = $subdomainInfo->domain;
+        $response  = $this->send("json-api/cpanel", [
+            "cpanel_jsonapi_module" => "SubDomain",
+            "cpanel_jsonapi_func"   => "delsubdomain",
+            "domain"                => $subdomain,
+        ], $this->addRule(new DomainRequestError));
+
+        return ($response->cpanelresult->data[0]->result == 1);
+    }
+
+    /**
      * @return mixed
      * @throws CPanelNotFoundException
      * @throws Exception
