@@ -126,13 +126,15 @@ class GuzzleDeployer implements DeployerInterface
      * @param array $query
      * @param array $body
      * @param string $method
+     * @param array $options
      * @return mixed
      * @throws CPanelNotFoundException
      * @throws Exception
+     * @throws WHMEmptyResponseException
      */
-    public function send($uri, array $query = array(), array $body = array(), $method = 'GET') {
+    public function send($uri, array $query = array(), array $body = array(), $method = 'GET', $options = array()) {
         $url     = $this->getRequestUrl($uri);
-        $options = $this->getDefaultRequestOptions();
+        $options = $this->getDefaultRequestOptions($options);
 
         if ($query) {
             $options["query"] = $query;
@@ -191,11 +193,12 @@ class GuzzleDeployer implements DeployerInterface
     /**
      * All settings has been taken from previous implementation.
      *
+     * @param array $options
      * @return array
      */
-    protected function getDefaultRequestOptions()
+    protected function getDefaultRequestOptions($options = array())
     {
-        return array(
+        return array_merge_recursive(array(
             "config" => array(
                 "curl" => array(
                     CURLOPT_SSL_VERIFYPEER => 0,
@@ -207,7 +210,7 @@ class GuzzleDeployer implements DeployerInterface
                     CURLOPT_FOLLOWLOCATION => true,
                 ),
             ),
-        );
+        ), $options);
     }
 
     /**
