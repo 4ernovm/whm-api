@@ -1,8 +1,9 @@
 {
     "name": "4ernovm/whm-api",
     "require": {
+        "php": ">=5.4.0",
         "guzzlehttp/guzzle": "~5.2.0",
-        "php": ">=5.4.0"
+        "symfony/event-dispatcher": "~3.0.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0"

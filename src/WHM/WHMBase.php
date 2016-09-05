@@ -2,11 +2,15 @@
 
 namespace Chernoff\WHM;
 
+use Chernoff\WHM\Events\OnRequestEvent;
+use Chernoff\WHM\Events\OnResponseEvent;
+use Chernoff\WHM\Events\OnValidationEvent;
 use Chernoff\WHM\Interfaces\AuthorizationInterface;
 use Chernoff\WHM\Interfaces\DeployerInterface;
 use Chernoff\WHM\Interfaces\ValidationRuleInterface;
 use Chernoff\WHM\ValidationRules\HasError;
 use Chernoff\WHM\ValidationRules\IsNull;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Class WHMBase
@@ -14,21 +18,40 @@ use Chernoff\WHM\ValidationRules\IsNull;
  */
 abstract class WHMBase
 {
-    /** @var  DeployerInterface */
+    /**
+     * @var  DeployerInterface
+     */
     protected $deployer;
 
-    /** @var Validator  */
+    /**
+     * @var Validator
+     */
     protected $validator;
 
-    /** @var ValidationRuleInterface[] */
+    /**
+     * @var ValidationRuleInterface[]
+     */
     protected $defaultRules;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $defaultPort;
 
-    public function __construct(GuzzleDeployer $deployer, Validator $validator) {
+    /**
+     * @var EventDispatcher
+     */
+    private $dispatcher;
+
+    /**
+     * @param GuzzleDeployer $deployer
+     * @param Validator $validator
+     * @param EventDispatcher $dispatcher
+     */
+    public function __construct(GuzzleDeployer $deployer, Validator $validator, EventDispatcher $dispatcher) {
         $this->deployer  = $deployer;
         $this->validator = $validator;
+        $this->dispatcher = $dispatcher;
 
         $this->defaultRules = array(new IsNull, new HasError);
     }
@@ -77,11 +100,19 @@ abstract class WHMBase
             $rules = $this->defaultRules;
         }
 
-        $response = $this->deployer->send($method, $args);
+        /** @var OnRequestEvent $event */
+        $event = $this->dispatcher->dispatch(OnRequestEvent::NAME, new OnRequestEvent($this->deployer, $method, $args));
+        $response = $this->deployer->send($event->getMethod(), $event->getArgs(), array(), 'GET', $event->getOptions());
 
-        $this->validator->validate($response, $rules);
+        /** @var OnResponseEvent $event */
+        $event = $this->dispatcher->dispatch(OnResponseEvent::NAME, new OnResponseEvent($response));
+        $response = $event->getResponse();
 
-        return $response;
+        /** @var OnValidationEvent $event */
+        $event = $this->dispatcher->dispatch(OnValidationEvent::NAME, new OnValidationEvent($response, $rules));
+        $this->validator->validate($event->getResponse(), $event->getRules());
+
+        return $event->getResponse();
     }
 
     /**
@@ -102,5 +133,13 @@ abstract class WHMBase
     public function addRules(array $rules)
     {
         return $this->defaultRules + $rules;
+    }
+
+    /**
+     * @return EventDispatcher
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
     }
 }
