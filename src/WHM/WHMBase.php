@@ -105,7 +105,7 @@ abstract class WHMBase
         $response = $this->deployer->send($event->getMethod(), $event->getArgs(), array(), 'GET', $event->getOptions());
 
         /** @var OnResponseEvent $event */
-        $event = $this->dispatcher->dispatch(OnResponseEvent::NAME, new OnResponseEvent($response));
+        $event = $this->dispatcher->dispatch(OnResponseEvent::NAME, new OnResponseEvent($this->deployer, $response));
         $response = $event->getResponse();
 
         /** @var OnValidationEvent $event */
