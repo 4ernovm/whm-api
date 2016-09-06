@@ -19,11 +19,18 @@ class OnResponseEvent extends Event
     private $response;
 
     /**
-     * @param mixed $response
+     * @var DeployerInterface
      */
-    public function __construct($response)
+    private $deployer;
+
+    /**
+     * @param DeployerInterface $deployer
+     * @param $response
+     */
+    public function __construct(DeployerInterface $deployer, $response)
     {
         $this->response = $response;
+        $this->deployer = $deployer;
     }
 
     /**
@@ -40,5 +47,21 @@ class OnResponseEvent extends Event
     public function setResponse($response)
     {
         $this->response = $response;
+    }
+
+    /**
+     * @return DeployerInterface
+     */
+    public function getDeployer()
+    {
+        return $this->deployer;
+    }
+
+    /**
+     * @param DeployerInterface $deployer
+     */
+    public function setDeployer($deployer)
+    {
+        $this->deployer = $deployer;
     }
 }
