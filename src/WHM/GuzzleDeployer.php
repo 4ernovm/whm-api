@@ -198,7 +198,7 @@ class GuzzleDeployer implements DeployerInterface
      */
     protected function getDefaultRequestOptions($options = array())
     {
-        return array_merge_recursive(array(
+        return array_replace_recursive(array(
             "config" => array(
                 "curl" => array(
                     CURLOPT_SSL_VERIFYPEER => 0,
