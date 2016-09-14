@@ -37,11 +37,16 @@ class GuzzleDeployer implements DeployerInterface
     /** @var  int */
     protected $port;
 
+    /** @var  array */
+    protected $defaultOptions;
+
     /**
      * @param Client $client
+     * @param array $defaultOptions
      */
-    public function __construct(Client $client) {
+    public function __construct(Client $client, array $defaultOptions = array()) {
         $this->client = $client;
+        $this->defaultOptions = $defaultOptions;
     }
 
     /**
@@ -196,21 +201,20 @@ class GuzzleDeployer implements DeployerInterface
      * @param array $options
      * @return array
      */
-    protected function getDefaultRequestOptions($options = array())
+    public function getDefaultRequestOptions($options = array())
     {
-        return array_replace_recursive(array(
-            "config" => array(
-                "curl" => array(
-                    CURLOPT_SSL_VERIFYPEER => 0,
-                    CURLOPT_SSL_VERIFYHOST => 0,
-                    CURLOPT_HEADER         => 0,
-                    CURLOPT_RETURNTRANSFER => 1,
-                    CURLOPT_TIMEOUT        => 60,
-                    CURLOPT_CONNECTTIMEOUT => 30,
-                    CURLOPT_FOLLOWLOCATION => true,
-                ),
-            ),
-        ), $options);
+        return array_replace_recursive($this->defaultOptions, $options);
+    }
+
+    /**
+     * @param array $options
+     * @return $this
+     */
+    public function setDefaultRequestOptions(array $options)
+    {
+        $this->defaultOptions = $options;
+
+        return $this;
     }
 
     /**
