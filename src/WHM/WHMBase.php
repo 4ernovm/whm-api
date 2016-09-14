@@ -2,6 +2,7 @@
 
 namespace Chernoff\WHM;
 
+use Chernoff\WHM\Events\OnConnectionReleaseEvent;
 use Chernoff\WHM\Events\OnRequestEvent;
 use Chernoff\WHM\Events\OnResponseEvent;
 use Chernoff\WHM\Events\OnValidationEvent;
@@ -141,5 +142,21 @@ abstract class WHMBase
     public function getDispatcher()
     {
         return $this->dispatcher;
+    }
+
+    /**
+     * @return GuzzleDeployer|DeployerInterface
+     */
+    public function getDeployer()
+    {
+        return $this->deployer;
+    }
+
+    /**
+     * Dispatches event which indicates that current connection is no longer needed.
+     */
+    public function release()
+    {
+        $this->dispatcher->dispatch(OnConnectionReleaseEvent::NAME, new OnConnectionReleaseEvent($this));
     }
 }
