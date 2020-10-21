@@ -25,7 +25,7 @@ class GuzzleDeployer implements DeployerInterface
     /** @var  \GuzzleHttp\Client */
     protected $client;
 
-    /** @var  AuthorizationInterface */
+    /** @var  AuthorizationInterface|null */
     protected $auth;
 
     /** @var string  */
@@ -50,11 +50,11 @@ class GuzzleDeployer implements DeployerInterface
     }
 
     /**
-     * @param AuthorizationInterface $auth
+     * @param AuthorizationInterface|null $auth
      * @throws Exception
      * @return DeployerInterface
      */
-    public function setAuth(AuthorizationInterface $auth)
+    public function setAuth(AuthorizationInterface $auth = null)
     {
         $this->auth = $auth;
 
@@ -62,7 +62,7 @@ class GuzzleDeployer implements DeployerInterface
     }
 
     /**
-     * @return AuthorizationInterface
+     * @return AuthorizationInterface|null
      */
     public function getAuth()
     {
@@ -154,7 +154,10 @@ class GuzzleDeployer implements DeployerInterface
         try {
             /** @var RequestInterface $request */
             $request = $this->client->createRequest($method, $url, $options);
-            $request->setHeaders($this->auth->toArray());
+
+            if (!empty($this->auth)) {
+                $request->setHeaders($this->auth->toArray());
+            }
 
             if (!empty($postBody)) {
                 $request->setBody($postBody);

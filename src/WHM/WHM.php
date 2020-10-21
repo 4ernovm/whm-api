@@ -271,4 +271,25 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
 
         return ($request->result[0]->status == 1);
     }
+
+    /**
+     * @param $username
+     * @return string
+     */
+    public function createToken($username)
+    {
+        $auth = clone $this->deployer->getAuth();
+
+        $this->setAuth();
+
+        $request = $this->send(
+            "json-api/api_token_create",
+            ["api.version" => 1, "token_name" => $username . '_ch_api_token'],
+            [new IsEmpty, new IsNull, new AccountRequestError]
+        );
+
+        $this->setAuth($auth);
+
+        return $request->result[0]->token;
+    }
 }

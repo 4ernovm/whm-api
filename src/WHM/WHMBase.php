@@ -58,10 +58,10 @@ abstract class WHMBase
     }
 
     /**
-     * @param AuthorizationInterface $auth
+     * @param AuthorizationInterface|null $auth
      * @return $this
      */
-    public function setAuth(AuthorizationInterface $auth)
+    public function setAuth(AuthorizationInterface $auth = null)
     {
         $this->deployer->setAuth($auth);
 
@@ -69,7 +69,7 @@ abstract class WHMBase
     }
 
     /**
-     * @return AuthorizationInterface
+     * @return AuthorizationInterface|null
      */
     public function getAuth()
     {
