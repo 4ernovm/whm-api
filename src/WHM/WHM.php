@@ -2,6 +2,7 @@
 
 namespace Chernoff\WHM;
 
+use Chernoff\WHM\AuthorizationAdapters\Basic;
 use Chernoff\WHM\Interfaces\ManageAccountInterface;
 use Chernoff\WHM\Interfaces\ManageAddonDomainInterface;
 use Chernoff\WHM\ValidationRules\AccountNotFound;
@@ -9,6 +10,7 @@ use Chernoff\WHM\ValidationRules\AccountRequestError;
 use Chernoff\WHM\ValidationRules\DomainRequestError;
 use Chernoff\WHM\ValidationRules\IsEmpty;
 use Chernoff\WHM\ValidationRules\IsNull;
+use Chernoff\WHM\ValidationRules\MetadataErrorReasonError;
 use Chernoff\WHM\ValidationRules\PackageError;
 use Exception;
 
@@ -274,22 +276,23 @@ class WHM extends WHMBase implements ManageAddonDomainInterface, ManageAccountIn
 
     /**
      * @param $username
+     * @param $password
      * @return string
      */
-    public function createToken($username)
+    public function createToken($username, $password)
     {
         $auth = clone $this->deployer->getAuth();
 
-        $this->setAuth();
+        $this->setAuth(new Basic($username, $password));
 
-        $request = $this->send(
+        $response = $this->send(
             "json-api/api_token_create",
-            ["api.version" => 1, "token_name" => $username . '_ch_api_token'],
-            [new IsEmpty, new IsNull, new AccountRequestError]
+            ["api.version" => 1, "token_name" => 'ch_api_token'],
+            [new IsNull, new MetadataErrorReasonError]
         );
 
         $this->setAuth($auth);
 
-        return $request->result[0]->token;
+        return $response->data->token;
     }
 }
